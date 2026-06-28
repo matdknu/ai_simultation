@@ -15,6 +15,8 @@ El nombre tiene dos lecturas a propósito. Cruzar el muro: lo que pasa
 el mismo mundo. El Wall de Wallmapu: el territorio donde ocurre todo esto
 no es abstracto. Es el sur de Chile. Está en el mapa.
 
+![UMP del diseño muestral ELRI — norte (izq.) → sur (der.)](docs/mapa_ump_puntos_horizontal.png)
+
 **Cross the Wall** no predice personas. Reproduce la lógica estructural del
 diseño muestral ELRI — manzanas reales, composición étnica empírica,
 trayectorias latentes de actitud calibradas con los datos — y proyecta
