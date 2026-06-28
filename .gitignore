@@ -1,0 +1,45 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+__pycache__/
+*.pyc
+.venv/
+.DS_Store
+
+# ── Datos locales (no versionar) ─────────────────────────────
+ELRI/data/
+ELSOC/data/
+**/data/*.dta
+**/data/*.RData
+**/data/*.csv
+
+# ── Outputs de análisis y ABM ───────────────────────────────
+ELRI/output/
+ELRI/analysis/output/
+ELSOC/analysis/output/
+ELSOC/frontend/tendencias.json
+**/abm_*.json
+**/ump_estructura*.json
+ELRI/analysis/output/territorio_abm.json
+ELRI/analysis/output/mapa_comunas_elri.geojson
+
+# ── Scripts de análisis (locales por ahora) ─────────────────
+ELRI/analysis/**/*.R
+ELRI/analysis/**/*.py
+ELSOC/analysis/**/*.R
+ELSOC/analysis/**/*.py
+
+# Mantener en repo: ABM runtime + frontend
+!ELRI/wallmapu/**
+!ELRI/run_wallmapu.py
+!ELRI/app_wallmapu.py
+!ELRI/frontend_wallmapu/**
+!ELSOC/barrio/**
+!ELSOC/app.py
+!ELSOC/run.py
+!ELSOC/frontend/**
+
+# Logs y checkpoints
+*.rds
+*.log
