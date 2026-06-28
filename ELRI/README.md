@@ -35,12 +35,12 @@ ELRI/
 ├── analysis/          # Pipeline empírico (local)
 ├── data/              # Panel ELRI + UMP (local)
 ├── output/            # Tablas y figuras (local)
-├── wallmapu/          # Motor ABM
-├── frontend_wallmapu/ # Interfaz web del simulador
+├── wallmapu/          # Motor ABM (Cross the Wall)
+├── frontend_wallmapu/ # Interfaz web Cross the Wall
 └── README.md
 ```
 
-## WallmapuSim (ABM)
+## Cross the Wall (ABM)
 
 Simulación de agentes calibrada con trayectorias latentes de actitud. Escenarios contrafactuales del estallido (más intenso, más suave, sin estallido). Territorio real del sur de Chile.
 

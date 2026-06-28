@@ -1,4 +1,4 @@
-# Cross the Wall( Mapu) - Agente Based Model
+# Cross the Wall
 
 *Cruzar el muro. Cruzar el Wall.*
 
@@ -21,7 +21,7 @@ más suave, o nunca hubiera ocurrido.
 
 | Carpeta | Qué es |
 |---------|--------|
-| [`ELRI/`](ELRI/) | Panel ELRI — conflicto mapuche–Estado, ABM WallmapuSim |
+| [`ELRI/`](ELRI/) | Panel ELRI — conflicto mapuche–Estado, ABM Cross the Wall |
 | [`ELSOC/`](ELSOC/) | Panel ESOC — contacto migratorio y simpatía, ABM BarrioSim |
 | [`crossthewall/`](crossthewall/) | Juego 2D interactivo |
 
