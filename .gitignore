@@ -6,22 +6,26 @@ __pycache__/
 *.pyc
 .venv/
 .DS_Store
-
-# ── Privado (solo local): juego, simulaciones, análisis ─────
-crossthewall/
-ELRI/
-ELSOC/
-docs/
 ai_simultation.Rproj
 
-# Datos y outputs
-**/data/
-**/output/
-**/analysis/
-*.dta
-*.RData
-*.csv
-*.rds
-*.log
-**/abm_*.json
-**/ump_estructura*.json
+# ── Código, datos y outputs (no publicar) ───────────────────
+**/*.py
+**/*.R
+**/*.js
+**/*.css
+**/*.html
+**/*.json
+**/*.geojson
+**/*.csv
+**/*.dta
+**/*.RData
+**/*.rds
+**/*.svg
+**/*.png
+**/*.log
+**/requirements.txt
+docs/
+
+# ── Permitir solo documentación y estructura de carpetas ────
+!**/README.md
+!**/.gitkeep

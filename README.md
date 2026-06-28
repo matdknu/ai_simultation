@@ -17,6 +17,14 @@ trayectorias latentes de actitud calibradas con los datos — y proyecta
 qué habría pasado si el estallido social de 2019 hubiera sido más intenso,
 más suave, o nunca hubiera ocurrido.
 
+## Proyectos
+
+| Carpeta | Qué es |
+|---------|--------|
+| [`ELRI/`](ELRI/) | Panel ELRI — conflicto mapuche–Estado, ABM WallmapuSim |
+| [`ELSOC/`](ELSOC/) | Panel ESOC — contacto migratorio y simpatía, ABM BarrioSim |
+| [`crossthewall/`](crossthewall/) | Juego 2D interactivo |
+
 ## Demo
 
 [![Muestra del juego — Cross the Wall](https://img.youtube.com/vi/NarVrjophkg/maxresdefault.jpg)](https://youtu.be/NarVrjophkg)
