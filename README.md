@@ -2,6 +2,7 @@
 
 *Cruzar el muro. Cruzar el Wall.*
 
+
 Un modelo de agentes calibrado con el panel ELRI (2016–2023) sobre actitudes
 intergrupales en el conflicto mapuche–Estado. Mapuche y no indígena, cuatro
 olas, un estallido en el medio, territorio real.
