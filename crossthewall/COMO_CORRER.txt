@@ -1,0 +1,157 @@
+Cross the Wall — cómo correr el juego
+=====================================
+
+Requisitos: Python 3.10+
+
+── Estructura de carpetas ────────────────────────────────────
+
+  crossthewall/
+  ├── run.sh              ← forma más fácil de jugar
+  ├── main.py
+  ├── requirements.txt
+  ├── .venv/              ← entorno virtual (local, no mezclar con ../.venv)
+  ├── assets/avatares/    ← PNG de los 6 perfiles
+  ├── core/               ← motor del juego
+  ├── ui/                 ← interfaz
+  ├── tools/              ← utilidades (avatares, análisis)
+  ├── data/sesiones/      ← GAME PRINT al terminar (JSON + PNG)
+  └── logs/               ← logs ABM opcionales (tecla L)
+
+── Primera vez ───────────────────────────────────────────────
+
+  cd crossthewall
+  chmod +x run.sh          # solo la primera vez
+  ./run.sh                 # crea .venv e instala dependencias solo
+
+  O manualmente:
+
+  python3 -m venv .venv
+  source .venv/bin/activate
+  pip install -r requirements.txt
+  python main.py
+
+── Cada vez que quieras jugar ────────────────────────────────
+
+  cd crossthewall
+  ./run.sh
+
+  O:
+
+  source .venv/bin/activate
+  python main.py
+
+  ⚠ Siempre ejecutar desde crossthewall/ (main.py lo fuerza automáticamente).
+
+── Flujo de sesión (7 minutos) ───────────────────────────────
+
+  0. Consentimiento informado (Sí → sigue / No → cierra)
+  1. Encuesta inicial (8 ítems) → perfil ELRI + avatar
+  2. Mundo abierto 7:00 con 15 viñetas (~cada 25 s)
+  3. Tras v07: misión CRUZAR EL MURO (Sí → secuencia / No → fin + game print)
+  4. Al terminar → GAME PRINT en data/sesiones/
+
+── Analizar los JSON exportados ──────────────────────────────
+
+  cd crossthewall
+  source .venv/bin/activate
+
+  # Tabla de todas las sesiones
+  python tools/analizar_sesiones.py
+
+  # Detalle de la última partida (trayectoria + decisiones)
+  python tools/analizar_sesiones.py --ultima
+
+  # Exportar CSV para R / Excel / Stata
+  python tools/analizar_sesiones.py --csv
+  # → data/sesiones/resumen.csv
+
+  # Una sesión específica
+  python tools/analizar_sesiones.py data/sesiones/gameprint_20260721_120817.json
+
+  Campos clave del JSON:
+  · perfil          — encuesta + perfil_id + d3_inicial + memo_base
+  · trayectoria_d3  — serie temporal [(t_s, d3), ...]
+  · respuestas      — cada viñeta: tipo, delta_efectivo, coherencia
+  · resumen         — delta_total, patron, conteo_tipos
+  · eventos         — viñetas abiertas, cambios de ola, diálogos NPC
+
+── Teclas ────────────────────────────────────────────────────
+
+  WASD / flechas     mover
+  E                  abrir chat con NPC cercano
+  Enter              enviar mensaje (dentro del chat)
+  Esc                cerrar chat
+  T                  subir/bajar del tren (solo en estación, vía horizontal)
+  Tab                panel ABM (shock estallido, parámetros)
+  P                  pausar
+  L                  guardar log de simulación (JSON en logs/)
+
+── Transporte y calle ────────────────────────────────────────
+
+  · Tren en la vía del sur (horizontal): para en 3 estaciones.
+  · Acércate al tren detenido y pulsa T para viajar rural ↔ ciudad.
+  · Autos circulan por caminos rurales y calles urbanas.
+  · Patrullas (🚓) recorren la avenida central: vigilan, generan
+    contacto negativo si pasan cerca, y disparan protestas.
+
+── Manifestaciones ─────────────────────────────────────────────
+
+  · Ola 3 / estallido / fase de organización: NPCs forman círculos
+    en la avenida con carteles.
+  · Organizadores y movilizados cruzan el muro en marcha.
+  · Las patrullas se despliegan hacia manifestantes durante el shock.
+
+── LLM (diálogos generativos, estilo CS 222) ─────────────────
+
+  pip install openai python-dotenv
+
+  Opción A — archivo .env en crossthewall/:
+
+    cp .env.example .env
+    # Edita .env y pon OPENAI_API_KEY=sk-...
+
+  Opción B — settings.py:
+
+    cp settings.example.py settings.py
+    # Edita OPENAI_API_KEY (este archivo no se sube a git)
+
+  Si LLM está activo, el HUD muestra "LLM on". Al hablar (E), escribes en el
+  panel de chat y el NPC responde con GPT a lo que escribiste. Sin API key
+  → respuestas locales (plantillas).
+
+  El juego interpreta lo que escribes:
+  · Insultar pacos / carabineros (ej. "paco weón") → patrullas + represión
+  · Protesta / Wallmapu → vecinos se movilizan
+  · Insultos racistas → tensión intergrupal
+  Las respuestas del NPC y el mundo reaccionan según su persona y zona.
+
+── Grito colectivo (easter egg del juego) ────────────────────
+
+  Con NPCs cerca, en el chat:
+  1. Escribe:  dame una H
+  2. La gente responde:  H
+  3. Escribe:  qué dice??
+  4. Todos:  jajaj
+
+  Tiene que ser en ese orden (tienes ~50 s entre paso 1 y 3).
+
+  ⚠ Nunca compartas tu API key en chat ni en el repositorio.
+
+── Simulación multi-agente (estilo CS 222) ─────────────────
+
+  · Cada NPC tiene una persona (background + estrategia retórica).
+  · Pasa el mouse sobre un NPC mientras habla → panel de reflexión.
+  · Pulsa L para exportar el log (interacciones, diálogos NPC, olas).
+  · Vuelve a correr python main.py para otra instancia (comparar runs).
+
+  Logs → crossthewall/logs/sim_log_YYYYMMDD_HHMMSS.json
+
+── Notas ───────────────────────────────────────────────────
+
+  · Sesión experimental: 7 minutos, 15 viñetas fijas, olas comprimidas.
+  · Zona rural (mapuche) ↔ muro ↔ zona urbana (no indígena).
+  · Perfil asignado por encuesta inicial (6 perfiles ELRI).
+  · Personas calibradas con lógica ELRI / muestra espejo (UMP mixtas).
+
+Referencia pedagógica: CS 222 Stanford — AI Agents and Simulations,
+Assignment 2 (personas, multi-agent interaction, reflexión, save log).

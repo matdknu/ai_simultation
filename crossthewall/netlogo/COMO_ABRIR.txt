@@ -1,0 +1,25 @@
+Cross the Wall — NetLogo
+========================
+
+ERROR que viste (Index 15 out of bounds for length 13):
+  → Pegaste el código sobre el modelo "Traffic 2 Lanes".
+  → Ese modelo tiene variables de tortuga distintas (cars).
+  → NetLogo no puede mezclar breeds/variables de dos modelos.
+
+SOLUCIÓN (elige una):
+
+A) Abrir el modelo listo (recomendado)
+   1. NetLogo 7 → File → Open
+   2. Selecciona: crossthewall/netlogo/CrossTheWall.nlogox
+   3. Setup → Go
+
+B) Modelo nuevo desde cero
+   1. File → New Model
+   2. Borra TODO el código de la pestaña Code
+   3. Pega el contenido de CrossTheWall_CODE.txt
+   4. En Interface: crea botones Setup, Go, SI-CRUZO, NO-CRUZO
+   5. Setup → Go
+
+NO hacer:
+   × Pegar código Cross the Wall sobre Traffic 2 Lanes
+   × Mezclar breeds (cars + agentes) en un mismo modelo

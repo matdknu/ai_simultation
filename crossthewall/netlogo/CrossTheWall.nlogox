@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+<model version="NetLogo 7.0.4" snapToGrid="true">
+  <code><![CDATA[
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Cross the Wall — ABM ELRI (NetLogo 7)
+;; NUEVO MODELO VACÍO: File → New, luego pega SOLO este código.
+;; NO pegar sobre "Traffic 2 Lanes" u otro modelo existente.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+globals [
+  ola
+  shock-intensidad
+  ticks-por-ola
+  brecha
+  mean-d3-map
+  mean-d3-noi
+  cruce-decision     ;; "pendiente" | "si" | "no"
+  cruce-completado?
+  vineta-idx
+  n-agentes
+]
+
+breed [ citizens citizen ]
+
+citizens-own [
+  grupo        ;; "mapuche" | "noi"
+  clase        ;; resistente | movilizado | endurecido | indiferente
+  d3
+  memo
+  w-pos
+  w-neg
+  shock-s
+  decay
+  en-protesta?
+  es-jugador?
+]
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to setup
+  clear-all
+  set-default-shape citizens "person"
+
+  set n-agentes 40
+  set shock-intensidad 1.0
+  set ticks-por-ola 150
+  set ola 1
+  set brecha 0
+  set cruce-decision "pendiente"
+  set cruce-completado? false
+  set vineta-idx 0
+
+  resize-world -55 55 -25 25
+  set-patch-size 7
+
+  ask patches [
+    set pcolor black
+    if pxcor >= -52 and pxcor <= -5  [ set pcolor brown + 1.5 ]
+    if pxcor >=  5  and pxcor <=  52 [ set pcolor gray - 1.5 ]
+    if pxcor >= -1  and pxcor <=  1  [ set pcolor yellow - 2 ]
+  ]
+
+  ;; Mapuche — zona rural (izquierda)
+  create-citizens (n-agentes / 2) [
+    set grupo "mapuche"
+    set es-jugador? false
+    assign-clase-mapuche
+    init-d3-y-coefs
+    setxy random-in-range -48 -8 random-ycor
+    set size 1.1
+    set en-protesta? false
+    paint-by-clase
+  ]
+
+  ;; No indígena — zona urbana (derecha)
+  create-citizens (n-agentes / 2) [
+    set grupo "noi"
+    set es-jugador? false
+    assign-clase-noi
+    init-d3-y-coefs
+    setxy random-in-range 8 48 random-ycor
+    set size 1.1
+    set en-protesta? false
+    paint-by-clase
+  ]
+
+  ;; Un jugador
+  create-citizens 1 [
+    set es-jugador? true
+    set grupo one-of ["mapuche" "noi"]
+    set clase "movilizado"
+    init-d3-y-coefs
+    set d3 2.5
+    setxy (ifelse-value (grupo = "mapuche") [-25] [25]) 0
+    set size 1.6
+    set color white
+    set en-protesta? false
+  ]
+
+  update-metrics
+  reset-ticks
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+to go
+  if not any? citizens [ stop ]
+
+  ;; Olas 1–4
+  let nueva-ola min list 4 (1 + floor (ticks / ticks-por-ola))
+  if nueva-ola != ola [
+    set ola nueva-ola
+    output-print (word "Ola " ola " | brecha: " precision brecha 3)
+  ]
+
+  ask citizens with [ not es-jugador? ] [
+    wander
+    if ola = 3 and shock-intensidad > 0 and (clase = "movilizado" or clase = "endurecido") [
+      set en-protesta? true
+      setxy random-in-range -8 8 ycor
+    ]
+    update-d3
+    paint-by-clase
+  ]
+
+  ask citizens with [ es-jugador? ] [ wander-jugador ]
+
+  if ola = 3 and shock-intensidad > 0 [ do-contagio ]
+
+  ;; Misión del cruce (después de ~7 viñetas)
+  if vineta-idx >= 7 and cruce-decision = "pendiente" and not cruce-completado? [
+    user-message "CRUZAR EL MURO: usa los botones SI-CRUZO o NO-CRUZO"
+    set cruce-decision "esperando"
+  ]
+
+  if cruce-decision = "no" and not cruce-completado? [
+    set cruce-completado? true
+    output-print "NO CRUZÓ — sesión termina"
+    stop
+  ]
+
+  if cruce-decision = "si" and not cruce-completado? [
+    ask citizens with [ es-jugador? ] [
+      set d3 max list 1 (d3 - 0.30)
+      setxy (ifelse-value (grupo = "mapuche") [20] [-20]) 0
+    ]
+    set cruce-completado? true
+    output-print "CRUZÓ — contacto profundo aplicado"
+  ]
+
+  if ticks mod 25 = 0 and vineta-idx < 15 [
+    ask citizens with [ es-jugador? ] [
+      set d3 max list 1 min list 5 (d3 + random-normal 0 0.15)
+    ]
+    set vineta-idx vineta-idx + 1
+  ]
+
+  update-metrics
+  tick
+end
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clases latentes LCGA
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+to assign-clase-mapuche
+  let r random 100
+  ifelse r < 35 [ set clase "resistente" ]
+  [ ifelse r < 65 [ set clase "movilizado" ]
+    [ ifelse r < 85 [ set clase "endurecido" ] [ set clase "indiferente" ] ] ]
+end
+
+to assign-clase-noi
+  let r random 100
+  ifelse r < 20 [ set clase "resistente" ]
+  [ ifelse r < 50 [ set clase "movilizado" ]
+    [ ifelse r < 85 [ set clase "endurecido" ] [ set clase "indiferente" ] ] ]
+end
+
+to init-d3-y-coefs
+  let base 2.3
+  if clase = "resistente"  [ set base ifelse-value (grupo = "mapuche") [1.9] [2.1] ]
+  if clase = "movilizado"  [ set base 2.3 ]
+  if clase = "endurecido"  [ set base ifelse-value (grupo = "mapuche") [2.8] [2.4] ]
+  if clase = "indiferente" [ set base ifelse-value (grupo = "mapuche") [2.1] [2.3] ]
+  set d3 max list 1 min list 5 (base + random-normal 0 0.25)
+
+  if clase = "resistente"  [ set memo 0.80 set w-pos 1.3 set w-neg 0.8
+    set shock-s ifelse-value (grupo = "mapuche") [-0.15] [0.05]
+    set decay   ifelse-value (grupo = "mapuche") [0.60] [0.50] ]
+  if clase = "movilizado"  [ set memo 0.65 set w-pos 1.0 set w-neg 1.2
+    set shock-s ifelse-value (grupo = "mapuche") [0.60] [0.50]
+    set decay   ifelse-value (grupo = "mapuche") [0.30] [0.20] ]
+  if clase = "endurecido"  [ set memo 0.88 set w-pos 0.6 set w-neg 1.4
+    set shock-s ifelse-value (grupo = "mapuche") [0.40] [0.20]
+    set decay   ifelse-value (grupo = "mapuche") [0.85] [0.90] ]
+  if clase = "indiferente" [ set memo 0.92 set w-pos 0.8 set w-neg 0.8
+    set shock-s ifelse-value (grupo = "mapuche") [0.10] [0.05]
+    set decay   ifelse-value (grupo = "mapuche") [0.50] [0.50] ]
+end
+
+to update-d3
+  let c-pos 0
+  let c-neg 0
+  if any? citizens in-radius 3 with [ grupo != [grupo] of myself and not es-jugador? ] [
+    set c-pos 0.25
+    if [clase] of one-of citizens in-radius 3 with [ grupo != [grupo] of myself ] = "endurecido" [
+      set c-neg 0.15
+    ]
+  ]
+
+  let d-shock 0
+  if ola = 3 [ set d-shock shock-s * shock-intensidad ]
+  if ola = 4 [ set d-shock (- shock-s * shock-intensidad) * (1 - decay) ]
+
+  let d-contact (0.20 * w-pos * c-pos + 0.15 * w-neg * c-neg - 0.02)
+  let delta (d-shock + d-contact)
+  let nuevo (memo * d3 + (1 - memo) * (d3 + delta))
+  set d3 max list 1 min list 5 nuevo
+end
+
+to paint-by-clase
+  set color ifelse-value (clase = "resistente") [violet + 1]
+    [ ifelse-value (clase = "movilizado") [orange]
+      [ ifelse-value (clase = "endurecido") [red] [gray] ] ] ]
+  if grupo = "mapuche" [ set color color + 2 ]
+end
+
+to wander
+  rt random 40 - 20
+  fd 0.4
+  if not en-protesta? [
+    if grupo = "mapuche" and xcor > -5 [ setx -6 ]
+    if grupo = "noi" and xcor < 5 [ setx 6 ]
+  ]
+end
+
+to wander-jugador
+  rt random 30 - 15
+  fd 0.25
+  if cruce-decision != "si" [
+    if grupo = "mapuche" and xcor > -5 [ setx -6 ]
+    if grupo = "noi" and xcor < 5 [ setx 6 ]
+  ]
+end
+
+to do-contagio
+  ask citizens with [ en-protesta? and d3 >= 2.3 ] [
+    ask citizens in-radius 5 with [ d3 < 4.8 and not es-jugador? ] [
+      set d3 min list 5 (d3 + 0.06 * shock-intensidad)
+    ]
+  ]
+end
+
+to update-metrics
+  set mean-d3-map ifelse-value (any? citizens with [ grupo = "mapuche" and not es-jugador? ])
+    [ mean [d3] of citizens with [ grupo = "mapuche" and not es-jugador? ] ] [ 0 ]
+  set mean-d3-noi ifelse-value (any? citizens with [ grupo = "noi" and not es-jugador? ])
+    [ mean [d3] of citizens with [ grupo = "noi" and not es-jugador? ] ] [ 0 ]
+  set brecha (mean-d3-map - mean-d3-noi)
+end
+
+to si-cruzo
+  set cruce-decision "si"
+end
+
+to no-cruzo
+  set cruce-decision "no"
+end
+]]></code>
+  <widgets>
+    <button x="10" y="10" width="80" height="40" display="Setup">setup</button>
+    <button x="100" y="10" width="80" height="40" display="Go" forever="true">go</button>
+    <button x="190" y="10" width="90" height="40" display="SI-CRUZO">si-cruzo</button>
+    <button x="290" y="10" width="90" height="40" display="NO-CRUZO">no-cruzo</button>
+    <monitor x="10" y="60" width="100" height="40" display="Ola" precision="0">ola</monitor>
+    <monitor x="120" y="60" width="120" height="40" display="Brecha d3" precision="3">brecha</monitor>
+    <monitor x="250" y="60" width="120" height="40" display="Media map" precision="2">mean-d3-map</monitor>
+    <monitor x="380" y="60" width="120" height="40" display="Media noi" precision="2">mean-d3-noi</monitor>
+    <monitor x="510" y="60" width="100" height="40" display="Viñeta" precision="0">vineta-idx</monitor>
+    <view x="10" y="110" width="600" height="400" patchSize="7" frameRate="30.0" updateMode="0" showTickCounter="true" tickCounterLabel="ticks"/>
+    <plot x="620" y="110" width="230" height="200" display="Brecha intergrupal">
+      <setup></setup>
+      <update>
+        plot brecha
+      </update>
+    </plot>
+    <plot x="620" y="320" width="230" height="200" display="d3 por grupo">
+      <setup></setup>
+      <update>
+        plot mean-d3-map
+        plot mean-d3-noi
+      </update>
+    </plot>
+  </widgets>
+  <info><![CDATA[Cross the Wall — ABM ELRI para NetLogo 7
+
+Abrir este archivo directamente (File → Open).
+NO pegar el código sobre otro modelo (ej. Traffic 2 Lanes).
+
+Setup → Go
+Ola 3 = estallido (shock-intensidad = 1.0)
+Botones SI-CRUZO / NO-CRUZO para la misión central.
+]]></info>
+</model>

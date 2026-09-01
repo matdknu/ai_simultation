@@ -1,0 +1,51 @@
+Cross the Wall — notas de simulación (CS 222 adaptado)
+======================================================
+
+Referencia: Stanford CS 222, Assignment 2 — Multi-Agent Interaction.
+
+Esta simulación no elige un "líder"; modela justificación de violencia
+intergrupal en territorio mixto (ELRI). Las mismas preguntas aplican.
+
+── Al jugar, anota ───────────────────────────────────────────
+
+1. Consistencia entre runs
+   - ¿El mismo NPC reacciona distinto cada vez?
+   - ¿Tu d3_1 evoluciona igual si repites con el mismo grupo?
+   - Guarda logs con L y compara JSON.
+
+2. Personas
+   - Principales con background ≥100 palabras: Lonko Marilef, Kuyen,
+     Millaray, Don Jorge, Marisol, Ñiküf.
+   - Hover sobre NPC → reflexión + estrategia retórica.
+   - ¿La reflexión coincide con lo que esperabas del personaje?
+
+3. Refinamiento
+   - Edita core/personas.py para ajustar traits / estrategia.
+   - Vuelve a correr y compara logs.
+
+4. Dinámica multi-agente
+   - Observa charlas autónomas entre NPCs (olas 2+).
+   - ¿Emergen patrones de solidaridad vs represión?
+   - ¿El shock (ola 3, Tab) cambia diálogos y brecha ABM?
+
+5. Predicción vs resultado
+   - Antes de ola 3: ¿sube o baja la brecha mapuche / no indígena?
+   - Después: ¿coincidió? ¿Por qué no?
+
+── Para writeup ──────────────────────────────────────────────
+
+Secciones sugeridas (mín. ~1000 palabras + apéndice de personas):
+
+  · Simulation consistency
+  · Persona refinement
+  · (Un)predictable outcomes
+  · Simulation dynamics
+
+Apéndice: copiar backgrounds desde core/personas.py o exportar
+personas desde el log JSON.
+
+── Archivos ──────────────────────────────────────────────────
+
+  core/personas.py      definición de agentes
+  core/sim_log.py       exportación de logs
+  logs/sim_log_*.json   instancias guardadas (tecla L)
