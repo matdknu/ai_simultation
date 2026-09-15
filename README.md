@@ -1,8 +1,3 @@
----
-editor_options: 
-  markdown: 
-    wrap: 72
----
 # Cross the Wall
 
 An agent-based model calibrated with the ELRI panel (2016–2023) on
