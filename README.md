@@ -3,7 +3,6 @@ editor_options:
   markdown: 
     wrap: 72
 ---
-
 # Cross the Wall
 
 An agent-based model calibrated with the ELRI panel (2016–2023) on
@@ -22,17 +21,16 @@ ethnic composition, latent attitude trajectories calibrated against the
 data — and projects what would have happened if the 2019 social uprising
 had been more intense, milder, or had never occurred.
 
-## Proyectos
+## Projects
 
-| Carpeta | Qué es |
-|--------------------------------------|----------------------------------|
-| [`ELRI/`](ELRI/) | Panel ELRI — conflicto mapuche–Estado, ABM Cross the Wall |
-| [`ELSOC/`](ELSOC/) | Panel ESOC — contacto migratorio y simpatía, ABM BarrioSim |
-| [`crossthewall/`](crossthewall/) | Juego 2D interactivo |
+| Folder                            | What it is                                                 |
+|-----------------------------------|-------------------------------------------------------------|
+| [`ELRI/`](ELRI/)                  | ELRI panel — Mapuche–State conflict, Cross the Wall ABM     |
+| [`ELSOC/`](ELSOC/)                | ESOC panel — migrant contact and sympathy, BarrioSim ABM    |
+| [`crossthewall/`](crossthewall/)  | Interactive 2D game                                          |
 
 ## Demo
 
-[![Muestra del juego — Cross the
-Wall](https://img.youtube.com/vi/NarVrjophkg/maxresdefault.jpg)](https://youtu.be/NarVrjophkg)
+[![Game preview — Cross the Wall](https://img.youtube.com/vi/NarVrjophkg/maxresdefault.jpg)](https://youtu.be/NarVrjophkg)
 
-*Demo en video — [ver en YouTube](https://youtu.be/NarVrjophkg)*
+*Video demo — [watch on YouTube](https://youtu.be/NarVrjophkg)*
